@@ -1,0 +1,30 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/m.css' %}">
+
+    <script type="text/javascript" src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+    <title>102030</title>
+</head>
+<body>
+{% static '' %}
+{% for m in data %}
+    <p>{{ m }}</p>
+{% endfor %}
+
+
+	<script type="text/javascript">
+		$(function() {
+			$('#dom').hide();
+			$('#kw').hide();
+		
+		})
+	</script>		
+
+
+</body>
+</html>

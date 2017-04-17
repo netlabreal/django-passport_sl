@@ -1,0 +1,56 @@
+html {
+    background: none repeat scroll 0 0 #EEE;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    transition: all .25s ease-out;
+    font-size: small;
+}
+body {
+    width: 90%;
+    margin: 0 auto;
+}
+.navbar{
+	background-color: #f6f6f6;
+}
+.top{
+	padding-top:15px;
+	color:blue;
+	list-style: none;
+	font-family: 'Russo One', sans-serif;
+	font-size:20px;
+}
+.to{
+	padding-top:5px;
+}
+.main{
+	background-color: white;
+	height:50px;
+	font-family: 'Alice', serif;
+	font-size:20px;
+	padding-left:35px;
+}
+.content{
+	background-color: #f6f6f6;
+	font-family: 'PT Sans', sans-serif;
+}
+.panel {
+    border: 1px solid #CCC;
+    box-shadow: 0 0 5px #ccc;
+}
+
+.rr{
+	margin-bottom:5px;
+}
+.input-group{padding-bottom: 10px;}
+.al{width:40px;}
+#vipiska{display:none;}
+
+@media print {
+#fio, .main, .content, #myModal, #adres, .modal-dialog{display: none}
+#vipiska{
+	font-size: 14px;
+	display: flex;
+
+}
+#vipi{display: none}
+}

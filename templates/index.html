@@ -1,0 +1,591 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="https://fonts.googleapis.com/css?family=Russo+One" rel="stylesheet">	
+		<link href="https://fonts.googleapis.com/css?family=Alice" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
+		<link type="text/css" href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+		<link type="text/css" href="{% static 'css/m.css' %}" rel="stylesheet">
+		
+    <script type="text/javascript" src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/sh.js' %}"></script>
+
+	<title>Паспортная служба</title>
+
+	</head>
+
+	<body>
+		<header>
+			<nav class="navbar navbar-static-top" role="navigation">
+			
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-sm-8 col-xs-8 col-center-xs">
+						<ul class="top">
+							<li>Паспортная служба Находкинского городского округа</li>
+						</ul>
+					</div>
+					<div class="col-sm-4 col-xs-4 col-center-xs">
+						<ul class="to">
+							<!--<li><img src="{% static 'img/user.jpg' %}" class="img-circle img-responsive pull-right" style="width:35px;  display: inline; "></li>-->
+<li class="dropdown pull-right"  style="display:inline-block;">
+    <a href="#" data-toggle="dropdown" class="dropdown-toggle" style="text-decoration: none;">
+                            {{ request.user }}
+      <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu">
+      <li><a href="/logout">Выход</a></li>
+    </ul>
+  </li>
+						</ul>
+					</div>
+				</div>
+				
+			</div>
+				
+			</nav>
+		</header>
+		
+		<section class="main">
+			<p>Выписка из поквартирной карточки</p>
+		</section>
+
+		<section class="content">
+			<div class="row" style="margin-left:15px; margin-right:15px; padding-top:20px;">
+                <div class="col-lg-12">
+				
+                    <div class="panel" id="real">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <i class="fa fa-fw fa-table"></i> Выбор адреса
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+							
+							<div class="col-md-6 col-xs-12 rr" id="street">
+								<div class="input-group">
+									<span class="input-group-addon">Улица</span>
+									<select id="sel_str" name="rSelect" class="form-control ng-valid ng-not-empty ng-dirty ng-valid-parse ng-touched" ng-model="st.strid" ng-change="returnDoma()">
+									</select>
+								</div>
+							</div>							
+							
+							<div class="col-md-3 col-xs-12 rr" id="dom">
+								<div class="input-group">
+									<span class="input-group-addon">Дом</span>
+									<select id="sel_doma" name="table1_length" aria-controls="table1" class="form-control input-sm">
+										<option value="7">7</option><option value="10">10</option><option value="25">25</option><option value="50">50</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-md-3 col-xs-12 rr" id="kw">
+								<div class="input-group">
+									<span class="input-group-addon">Квартира</span>
+									<select id="sel_kw" name="table1_length" aria-controls="table1" class="form-control input-sm">
+										<option value="7">7</option><option value="10">10</option><option value="25">25</option><option value="50">50</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+
+                    <div class="panel" id="error">
+                        <div class="panel-body">
+                            <h3>Произошла ошибка. Обратитесь к администратору!</h3>
+						</div>
+					</div>
+
+
+				
+                    <div class="panel" id="spisok_ls">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <i class="fa fa-fw fa-table"></i> Список лицевых счетов
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <div id="sample_1_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+				
+									<div class="row">
+										<div class="col-sm-12">
+											<table class="table table-striped table-bordered table-hover dataTable no-footer" id="sample_1" role="grid" aria-describedby="sample_1_info">
+												<thead>
+												<tr role="row"><th class="sorting_asc" tabindex="0" aria-controls="sample_1" rowspan="1" colspan="1" >Номер лс</th><th>ФИО</th><th></th></tr>
+												</thead>
+												<tbody class="odd" style="cursor: pointer">
+												</tbody>
+											</table>
+                            
+							
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					
+					
+					
+				</div>
+			</div>	
+		</section>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <p class="modal-title" id="adres" style="font-weight: bold"></p>
+      </div>
+      <div class="modal-body">
+          <div id="fio"></div>
+
+        <ul class="nav nav-tabs">
+          <li class="active"><a data-toggle="tab" href="#gils">Жильцы</a></li>
+          <li><a data-toggle="tab" href="#docs">Документы</a></li>
+        </ul>
+
+        <div class="tab-content">
+          <div id="gils" class="tab-pane fade in active">
+                            <table class="table table-bordered " style="margin-top: 15px;">
+                                <thead>
+                                    <tr role="row"><th>Отнош.</th><th>Собств.</th><th>ФИО</th><th>Дата рождения</th><th>Дата прописки</th><th>Дата выписки</th></tr>
+                                </thead>
+                                <tbody class="ludi">
+                                </tbody>
+                            </table>
+          </div>
+          <div id="docs" class="tab-pane fade">
+                            <table class="table table-bordered " style="margin-top: 15px;">
+                                <thead>
+                                    <tr role="row"><th>Фио</th><th>Доля</th><th>Примечание</th></tr>
+                                </thead>
+                                <tbody class="doci">
+                                </tbody>
+                            </table>
+          </div>
+
+
+
+
+      </div>
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+
+        <button type="button" id="vip" class="btn btn-error">Выписка лс</button>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="modal fade al" >
+        <div class="modal-dialog modal-sm" style="width: 90px;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img src="{% static 'img/loader.gif' %}" style="text-align: center"/>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <div id="vipiska">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-6 col-xs-6" style="text-align: left; font-style: italic; padding-top: 20px;">Муниципальное унитарное предприятие<br/>"Центр приема платежей от населения"<br/>Находкинского городского округа</div>
+				<div class="col-md-6 col-xs-6" style="text-align: right; padding-top: 20px;">Форма №10</div>
+
+				<div class="col-md-12 col-xs-12" style="padding-top: 10px; font-weight: bold;">Выдана для предъявления: По месту требования</div>
+
+
+                <div class="col-md-12 col-xs-12" style="padding-top: 10px; text-align: center"><h3>Выписка из поквартирной карточки</h3></div>
+
+                <div id="fio_print" class="col-md-12 col-xs-12" style="padding-top: 10px;"></div>
+                <div class="col-md-12 col-xs-12" style="padding-top: 10px;">Респ.,край.,обл.,окр.: <strong>Приморский край</strong></div>
+                <div id="adr_print" class="col-md-12 col-xs-12" style="padding-top: 10px;"></div>
+                <div id="plosh_print" class="col-md-12 col-xs-12" style="padding-top: 10px;"></div>
+                <div id="komn_print" class="col-md-12 col-xs-12" style="padding-top: 10px;"></div>
+                <div id="doc_print" class="col-md-12 col-xs-12" style="padding-top: 10px; font-weight: bold;"></div>
+
+                <div class="col-md-12 col-xs-12 col-lg-12 col-sm-12" style="padding-top: 10px; font-weight: bold;">
+                <table class="table table-bordered " style="margin-top: 15px;">
+                    <thead>
+                    <tr role="row"><th style="text-align: center; vertical-align: middle;">Родство<br>Доля владения</th><th style="text-align: center; vertical-align: middle;">Фамилия, имя, отчество</th><th style="text-align: center; vertical-align: middle;">Дата рождения</th><th style="text-align: center; vertical-align: middle;">Дата прописки</th><th style="text-align: center; vertical-align: middle;">Регистрация</th><th style="text-align: center; vertical-align: middle;">Дата снятия с регистрационного учета</th></tr>
+                    </thead>
+                    <tbody id="dla_vipiski">
+                    </tbody>
+                </table>
+                </div>
+
+            </div>
+        </div>
+
+         <button type="button" id="vipi" class="btn btn-error">Выписка с лс</button>
+      </div>
+
+
+	<script type="text/javascript">
+		$(function() {
+			var streets = $('#sel_str');
+			var doma = $('#sel_doma');
+			var kws = $('#sel_kw');
+			var sp_ls = $('.odd');
+			$('#spisok_ls').hide();
+			$('#dom').hide();
+			$('#kw').hide();
+			$('#real').hide();
+			$('#error').hide();
+
+
+			$('#vipi').click(function(){
+			    window.print();
+            });
+			$('#vip').click(function(){
+			    $('#myModal').modal('hide');
+			    window.print();
+            });
+			////////////////////////////////////////////////////////////////
+			function ret_street(){
+				$.ajax({
+				type:"POST",
+				dataType: "json",
+				url:"data/",
+				data:{par:"1"},
+				beforeSend: function() {
+				},
+				complete:function(data){
+                    setTimeout(function(){
+		                $('.al').modal('hide');
+                        streets.append('<option value=0>---</option>');
+                        $.each(data.responseJSON, function(key, val){
+						streets.append('<option value='+val[0]+'>' +val[1]+' -- '+val[2]+'</option>');
+					});
+                        $('#real').show();
+    	            }, 300);
+				},
+                error:function (error) {
+                    $('#real').hide();
+                    $('#error').show();
+                }
+
+				});
+			}
+			////////////////////////////////////////////////////////////////
+			function ret_doma($sid){
+				$.ajax({
+				type:"POST",
+				dataType:"json",
+				url:"data/",
+				data:{par:"2", id:$sid},
+				beforeSend: function() {
+				},
+				complete:function(data){
+                    setTimeout(function(){
+                        doma.empty();
+		                $('.al').modal('hide');
+    					doma.append('<option value=0>---</option>');
+                        $.each(data.responseJSON, function(key, val){
+                            doma.append('<option value='+val[0]+'>' +val[1]+val[2]+'</option>');
+                        });
+                        $('#real').show();
+					},300);
+                    },
+                error:function (error) {
+                    $('#real').hide();
+                    $('#error').show();
+                }
+							
+				});
+			}
+			////////////////////////////////////////////////////////////////
+			function ret_kw($sid){
+				$.ajax({
+				type:"POST",
+				dataType:"json",
+				url:"data/",
+				data:{par:"3", id:$sid},
+				beforeSend: function() {
+				},
+				complete:function(data){
+                    setTimeout(function(){
+                        kws.empty();
+		                $('.al').modal('hide');
+                        kws.append('<option value=0>---</option>');
+                        $.each(data.responseJSON, function(key, val){
+                            kws.append('<option value='+val[0]+'>' +val[1]+val[2]+'</option>');
+                       });
+                        $('#real').show();
+                    },300);
+					},
+                error:function (error) {
+                    $('#real').hide();
+                    $('#error').show();
+                }
+
+				});
+			}
+			////////////////////////////////////////////////////////////////
+			function ret_chel($sid){
+				$.ajax({
+				type:"POST",
+				dataType:"json",
+				url:"data/",
+				data:{par:"5", id:$sid},
+				beforeSend: function() {
+				},
+				complete:function(data){
+                    setTimeout(function(){
+		                $('.al').modal('hide');
+                        $('.ludi').empty();  $('.doci').empty(); $('#dla_vipiski').empty();
+                        $('#doc_print').text('');
+                        $.each(data.responseJSON, function(key, val){
+                            $('.ludi').append('<tr><td>'+val[3]+'</td><td>'+sobstvennik(val[4])+'</td><td>'+val[0]+'</td><td>'+ret_data(val[10])+'</td><td>'+ret_data(val[1])+'</td> <td>'+ret_data(val[2])+'</td></tr>');
+
+                             //Opredelenie dannix dla vipiski
+                              var rozd = new String();
+                              for (var i = 0; i < val[12].length; i++)
+                              {
+                                  ch = val[12].charAt(i);
+                                  if(ch=="¦"){ch=" ";}
+                                    rozd += ch;
+                              }
+                              var vib = new String();
+                              for (var i = 0; i < val[13].length; i++)
+                              {
+                                  ch = val[13].charAt(i);
+                                  if(ch=="¦"){break}
+                                    vib += ch;
+                              }
+                              prich = "";
+                              if(val[14]!="None"){prich="умер(ла)";}
+
+                                $('#dla_vipiski').append('<tr><td style="font-weight:bold; text-align:center; font-size: 12px;">'+val[3]+'<br>'+dola(val[8],val[9])+'</td><td style="min-width:280px; font-weight:100;">'+val[0]+'</td><td style="min-width:100px; font-weight:100;">'+ret_data(val[10])+'</td><td  style="min-width:100px; font-weight:100;">'+ret_data(val[1])+'</td><td style="font-weight:100;">'+registr(val[15])+'</td><td  style="max-width:100px; font-weight:100;">'+ret_data(val[2])+'</td></tr>')
+                                $('#dla_vipiski').append('<tr><td style="font-size: 10px; min-width:130px; font-style: italic;" colspan="1">Место рождения:</td><td colspan="5" style=" font-weight:100;">'+rozd+'</td></tr>');
+                                $('#dla_vipiski').append('<tr><td style="font-size: 10px; min-width:130px; font-style: italic;" colspan="1">Место выбытия: </td><td colspan="5" style=" font-weight:100;">'+vib+'</td></tr>');
+                                $('#dla_vipiski').append('<tr><td style="font-size: 10px; min-width:130px; font-style: italic;" colspan="1">Причина выбытия: </td><td colspan="5" style=" font-weight:100;">'+prich+'</td></tr>');
+
+
+                             if(val[4]!=null)
+                             {
+                                $('.doci').append('<tr><td>'+val[0]+'</td><td>'+val[8]+'/'+val[9]+'</td><td>'+osnovanie(val[11])+' '+val[4]+' от '+ret_data(val[7])+'</td></tr> ');
+                                $('#dla_vipiski').append('<tr><td style="font-size: 12px; font-weight:bold; min-width:110px; font-style: italic;" colspan="6">'+osnovanie(val[11])+' '+val[4]+' от '+ret_data(val[7])+'</td></tr>');
+
+                                 if(val[3]=='собственник')
+                                 {
+                                     $('#doc_print').text(osnovanie(val[11])+' '+val[4]+' от '+ret_data(val[7]));
+                                 }
+                                 if(val[3]==' Собственник')
+                                 {
+                                     $('#doc_print').text(osnovanie(val[11])+' '+val[4]+' от '+ret_data(val[7]));
+                                 }
+
+                             }
+                        });
+                        $('#real').show();
+                    },300);
+                },
+                error:function (error) {
+                    $('#real').hide();
+                    $('#error').show();
+                }
+				});
+			}
+			////////////////////////////////////////////////////////////////
+			function ret_params($sid){
+				$.ajax({
+				type:"POST",
+				dataType:"json",
+				url:"data/",
+				data:{par:"6", id:$sid},
+				beforeSend: function() {
+				},
+				complete:function(data){
+                        $.each(data.responseJSON, function(key, val){
+                            if(val[0]=="ОБЩПЛОЩАДЬ"){$('#oplosh_i').val(val[1])}
+                            if(val[0]=="ЖИЛПЛОЩАДЬ"){$('#gplosh_i').val(val[1])}
+                            if(val[0]=="КОМНАТЫ"){$('#komnat_i').val(val[1])}
+                        });
+                        $('#plosh_print').empty(); $('#komn_print').empty();
+                        $('#plosh_print').append('Площадь (кв.м): жилая - <strong>'+$('#gplosh_i').val()+'</strong> общая - <strong>'+$('#oplosh_i').val()+'</strong>');
+                        $('#komn_print').append('Количество комнат: <strong>'+$('#komnat_i').val()+'</strong>');
+					},
+                error:function (error) {
+                   $('#real').hide();
+                   $('#error').show();
+                }
+
+				});
+			}
+			////////////////////////////////////////////////////////////////
+			function ret_ls($sid){
+				$.ajax({
+				type:"POST",
+				dataType:"json",
+				url:"data/",
+				data:{par:"4", id:$sid},
+				beforeSend: function() {
+				},
+				complete:function(data){
+                        $.each(data.responseJSON, function(key, val){
+                            if(val[2]!="архив")
+                            {
+                                sp_ls.append('<tr class="clickable" id="click'+val[0]+'" data='+val[0]+'><td>'+val[1]+'</td><td>'+val[3]+'</td><td>'+val[2]+'</td></tr>');
+                                 $('#click'+val[0]).click(function(){
+                                        ret_chel($(this).attr('data'));
+                                        ret_params($(this).attr('data'));
+                                            var str = $('#sel_str option:selected').text();
+                                            var substringArray = str.split(" -- ");
+                                            $('#adres').text(substringArray[1] + '. ' + substringArray[0] + '  д.' + $('#sel_doma option:selected').text() + '  кв.' + $('#sel_kw option:selected').text() + ' (лс № ' + val[1] + ' ' + val[2] + ' )');
+                                            $('#fio').empty();
+                                            $('#fio').append('<div class="row"><div class="col-sm-12"><div class="input-group"><span class="input-group-addon">ФИО:</span><input id="fio_i" type="text" class="form-control"></div></div></div>');
+                                            $('#fio').append('  <div class="col-sm-4"><div class="input-group"><span class="input-group-addon">Общая S:</span><input id="oplosh_i" type="text" class="form-control"  style="font-weight: bold"></div></div>   <div class="col-sm-4"><div class="input-group"><span class="input-group-addon">Жилая S:</span><input id="gplosh_i" type="text" class="form-control"  style="font-weight: bold"></div></div>   <div class="col-sm-4"><div class="input-group"><span class="input-group-addon">Комнат:</span><input id="komnat_i" type="text" class="form-control"  style="font-weight: bold"></div></div>    </div>');
+
+                                            $('#fio_print').empty(); $('#adr_print').empty();
+                                            $('#fio_print').append('Фамилия И.О нанимателя (собственника): <strong>'+val[3]+'</strong>');
+                                            $('#adr_print').append('Адрес: <strong>Находка, '+substringArray[1] + '. ' + substringArray[0] + '  д.' + $('#sel_doma option:selected').text() + '  кв.' + $('#sel_kw option:selected').text()+'</strong>');
+
+                                            $('#fio_i').val(val[3]);
+                                            $(".nav-tabs a:first").tab("show");
+                                            $('#myModal').modal('show');
+                                 });
+                             }
+                        });
+					},
+                error:function (error) {
+                    $('#real').hide();
+                    $('#error').show();
+                }
+
+				});
+			}
+			////////////////////////////////////////////////////////////////
+			function osnovanie($param){
+			    var res="";
+			    if($param!=null){
+                    switch($param) {
+                      case 0: res="Договор приватизации";break;
+                      case 1: res="Договор купли-продажи";break;
+                      case 2: res="Свидетельство о праве на наследство";break;
+                      case 3: res="Договор мены";break;
+                      case 4: res="Договор дарения";break;
+                      case 5: res="Решение суда";break;
+                      case 6: res="Справка о выплаченном пае";break;
+                      case 7: res="Договор долевого участия в строительстве";break;
+                      case 8: res="Договор социального найма жилого помещения";break;
+                      case 9: res="Договор коммерческого найма жилого помещения";break;
+                      case 10: res="Договор специализированного найма жилого помещения";break;
+                      case 11: res="Ордер";break;
+                      case 12: res="Обменный ордер";break;
+                      case 13: res="Служебный ордер";break;
+                      case 14: res="Свидетельство о государственной регистрации права";break;
+                      case 15: res="Государственная регистрация права";break;
+                      case 16: res="Регистрационное удостоверение";break;
+                      case 17: res="Свидетельство о государственной регистрации права";break;
+                      case 18: res="Выписка  ";break;
+                      case 19: res="Постановление";break;
+                      case 20: res="Договор субаренды";break;
+                      case 21: res="Документов на вселения нет";break;
+                      case 22: res="Дополнительное соглашение";break;
+                      case 24: res="Договор аренды";break;
+                      case 25: res="Администрация Находкинского гор. округа";break;
+                      case 26: res="Договор найма";break;
+                      case 27: res="Справка ЖСК";break;
+                      case 28: res="Договор ренты";break;
+                      case 29: res="Свидетельство о праве собственности";break;
+                      case 30: res="Распоряжение";break;
+                      case 31: res="Договор безвозмездной передачи";break;
+                      case 32: res="Направление";break;
+                      case 33: res="Договор     ";break;
+                      case 34: res="Тех.паспорт";break;
+                      case 35: res="Выписка из ЕГРП";break;
+                      case 36: res="Договор найма служебного жилого помещения";break;
+                      case 37: res="Выписка из ЕГРН";break;
+                      case 38: res="Типовой договор социального найма жилого помещения";break;
+			        }
+			    }
+			    return res;
+            }
+            ////////////////////////////////////////////////////////////////
+            function registr($param) {
+			    var res="";
+			    if($param!=null) {
+                    switch ($param) {
+                        case 0:
+                            res = "постоянная";
+                            break;
+                        case 1:
+                            res = "временная";
+                            break;
+                        case 3:
+                            res = "без регистрации";
+                            break;
+                    }
+                }
+                 return res;
+            }
+            ////////////////////////////////////////////////////////////////
+            function sobstvennik($param){
+			    var res="";
+			    if($param!=null){res="X";}
+			    return res;
+            }
+			////////////////////////////////////////////////////////////////
+			function ret_data($param){
+                var res="";
+                if($param!="None"){res= $param.substr(0,10);}
+                return res;
+            }
+            ////////////////////////////////////////////////////////////////
+            function dola($param1, $param2) {
+                var res="";
+                if($param1!=null && $param2!=null){res= $param1+"/"+$param2;}
+                return res;
+
+            }
+            ////////////////////////////////////////////////////////////////
+
+			ret_street();
+			streets.change(function(){
+				if(streets.val()!=0){
+					$('#dom').show();
+					$('#kw').hide();
+					$('#spisok_ls').hide();
+					doma.empty();
+					ret_doma(streets.val());
+				}
+			});	
+			doma.change(function(){
+				if(doma.val()!=0){
+				    kws.empty();
+					$('#kw').show();
+					$('#spisok_ls').hide();
+					ret_kw(doma.val());
+				}
+			});
+			kws.change(function(){
+			    if(kws.val()!=0){
+			        sp_ls.empty();
+			        $('#spisok_ls').show();
+			        ret_ls(kws.val());
+                }
+            });
+
+			
+		})
+	</script>		
+	</body>
+</html>

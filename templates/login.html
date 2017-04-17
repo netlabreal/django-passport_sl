@@ -1,0 +1,40 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/m.css' %}">
+    <script type="text/javascript" src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    <title></title>
+</head>
+<body>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-2">
+                </div>
+                <div class="col-xs-8">
+                    <div class="panel panel-default" id="login" style="margin-top: 25px;">
+                        <div class="panel-heading" id="fiols">Авторизация</div>
+                           <div class="panel-body">
+                               <form method="post">
+                                   <input name="login" type="text" class="form-control" placeholder="Логин" id="uname" style="margin-bottom: 10px;">
+                                   <input name="password" type="password" class="form-control" placeholder="Пароль" id="pass" style="margin-bottom: 10px;">
+                                   <input name="submit" type="submit" value="Войти" class="btn btn-primary" id="enter" style="margin-bottom: 10px;">
+                                   <!--<div class="alert-danger" id="lp" style="padding-bottom: 10px;">login:102030; password:102030.</div>-->
+                               </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="status">{{ error }}</div>
+
+            </div>
+        </div>
+
+</body>
+</html>
